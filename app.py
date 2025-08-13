@@ -6,7 +6,7 @@ import tensorflow as tf
 # Load model (ví dụ: model Keras đã train trên MNIST)
 @st.cache_resource
 def load_model():
-    return tf.keras.models.load_model("mnist_model.h5")
+    return tf.keras.models.load_model("mnist_model.keras")
 
 model = load_model()
 
