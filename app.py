@@ -27,6 +27,8 @@ def preprocess_canvas_image(img_pil):
 
     # 6. Chuẩn hóa về [0,1]
     img_array = np.array(background) / 255.0
+    plt.imshow(img_array.squeeze(), cmap="gray")
+    st.pyplot(plt)
     img_array = img_array.reshape(1, 28 * 28)
 
     return img_array
