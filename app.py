@@ -5,6 +5,33 @@ from streamlit_drawable_canvas import st_canvas
 import tensorflow as tf
 import matplotlib.pyplot as plt
 # Load model (ví dụ: model Keras đã train trên MNIST)
+
+def preprocess_canvas_image(img_pil):
+    # 1. Chuyển sang grayscale
+    img = img_pil.convert("L")
+
+    # 2. Invert nếu cần (trắng nét, đen nền)
+    # img = ImageOps.invert(img)
+
+    # 3. Lấy bounding box của nét vẽ
+    bbox = img.getbbox()
+    if bbox:
+        img = img.crop(bbox)
+
+    # 4. Resize nét vẽ về 20x20
+    img = img.resize((20, 20), Image.LANCZOS)
+
+    # 5. Tạo nền đen 28x28 và dán ảnh vào giữa
+    background = Image.new("L", (28, 28), (0))
+    background.paste(img, ((28 - 20) // 2, (28 - 20) // 2))
+
+    # 6. Chuẩn hóa về [0,1]
+    img_array = np.array(background) / 255.0
+    img_array = img_array.reshape(1, 28 * 28)
+
+    return img_array
+
+
 @st.cache_resource
 def load_model():
     return tf.keras.models.load_model("mnist_model.keras")
@@ -32,23 +59,8 @@ canvas_result = st_canvas(
 if st.button("Dự đoán"):
     if canvas_result.image_data is not None:
         # Lấy ảnh từ canvas
-        img = canvas_result.image_data
-
-        # Chuyển sang PIL để resize
-        img = Image.fromarray((img[:, :, 0:3]).astype(np.uint8))  # Bỏ alpha
-        img = img.convert("L")  # Chuyển grayscale
-        img = img.resize((28, 28), Image.LANCZOS)
-
-        # Chuẩn hóa dữ liệu cho model
-        img_array = np.array(img)
-        plt.imshow(img_array.squeeze(), cmap="gray")
-        st.pyplot(plt)
-        img_array = img_array / 255.0
-        img_array = img_array.reshape((1, 28 * 28))
-
-        
-
-        # Suy luận
+        img = Image.fromarray((canvas_result.image_data[:, :, 0:3]).astype(np.uint8))
+        img_array = preprocess_canvas_image(img)
         prediction = model.predict(img_array)
         predicted_digit = np.argmax(prediction)
 
