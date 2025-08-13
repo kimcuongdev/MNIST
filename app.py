@@ -3,6 +3,7 @@ import numpy as np
 from PIL import Image
 from streamlit_drawable_canvas import st_canvas
 import tensorflow as tf
+import matplotlib.pyplot as plt
 # Load model (ví dụ: model Keras đã train trên MNIST)
 @st.cache_resource
 def load_model():
@@ -42,6 +43,10 @@ if st.button("Dự đoán"):
         img_array = np.array(img)
         img_array = img_array / 255.0
         img_array = img_array.reshape((1, 28 * 28))
+
+        
+        plt.imshow(img_array.squeeze(), cmap="gray")
+        plt.show()
 
         # Suy luận
         prediction = model.predict(img_array)
