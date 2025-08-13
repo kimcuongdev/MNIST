@@ -41,12 +41,12 @@ if st.button("Dự đoán"):
 
         # Chuẩn hóa dữ liệu cho model
         img_array = np.array(img)
+        plt.imshow(img_array.squeeze(), cmap="gray")
+        plt.show()
         img_array = img_array / 255.0
         img_array = img_array.reshape((1, 28 * 28))
 
         
-        plt.imshow(img_array.squeeze(), cmap="gray")
-        plt.show()
 
         # Suy luận
         prediction = model.predict(img_array)
